@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">ToDoList</string>
+    <string name="add_task">Add Task</string>
+    <string name="generic_task">Generic Task</string>
+    <string name="name">Name</string>
+    <string name="content">Content</string>
+    <string name="done">Done</string>
+    <string name="section_general">General</string>
+    <string name="lb_title">Title</string>
+    <string name="lb_description">Description</string>
+    <string name="section_date">Date</string>
+    <string name="lb_date">Date</string>
+    <string name="save">save</string>
+    <string name="back">Back</string>
+    <string name="validation_invalid_title">Title cannot be empty</string>
+    <string name="more">More</string>
+    <string name="date">Date</string>
+    <string name="generic_content">generic_content</string>
+</resources>
