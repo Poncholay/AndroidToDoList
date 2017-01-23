@@ -2,7 +2,6 @@ package com.poncholay.todolist.Activities.List;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -12,11 +11,12 @@ import android.view.View;
 import com.github.ybq.parallaxviewpager.Mode;
 import com.github.ybq.parallaxviewpager.ParallaxViewPager;
 import com.poncholay.todolist.Activities.CreateTask.CreateTaskActivity;
-import com.poncholay.todolist.Activities.List.Views.ListAllFragment;
+import com.poncholay.todolist.Activities.List.Fragments.ListFragmentAllFragment;
+import com.poncholay.todolist.Activities.List.Fragments.TaskListFragment;
 import com.poncholay.todolist.Constants;
 import com.poncholay.todolist.R;
-import com.poncholay.todolist.controller.db.TaskActions;
-import com.poncholay.todolist.controller.db.TaskDbHelper;
+import com.poncholay.todolist.controller.db.DatabaseActions;
+import com.poncholay.todolist.controller.db.DatabaseHelper;
 import com.poncholay.todolist.controller.tab.TabsAdapter;
 import com.poncholay.todolist.model.tab.Tab;
 import com.poncholay.todolist.model.task.Task;
@@ -30,8 +30,10 @@ import java.util.List;
 
 public class ListActivity extends AppCompatActivity {
 
-	TaskActions database;
-	List<Task> tasks;
+	private DatabaseActions mDatabase;
+	private List<Task> mTasks;
+	private List<Tab> mTabs;
+
 	private static final String TAG = "ListActivity";
 
 	@Override
@@ -39,12 +41,12 @@ public class ListActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_list);
 
-		database = new TaskActions(new TaskDbHelper(this));
-		tasks = database.getTasks();
+		mDatabase = new DatabaseActions(new DatabaseHelper(this));
+		mTasks = mDatabase.getTasks();
 
-		final List<Tab> fragments = createFragments();
+		mTabs = createFragments();
 		ParallaxViewPager mParallaxViewPager = (ParallaxViewPager) findViewById(R.id.viewpager);
-		TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager(), fragments);
+		TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager(), mTabs);
 		mParallaxViewPager.setAdapter(tabsAdapter);
 		mParallaxViewPager.setOffscreenPageLimit(1);
 		mParallaxViewPager.setMode(Mode.LEFT_OVERLAY);
@@ -60,7 +62,8 @@ public class ListActivity extends AppCompatActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.action_add_task:
-				return createTask();
+				callCreateTaskActivity();
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -69,34 +72,26 @@ public class ListActivity extends AppCompatActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == AppCompatActivity.RESULT_OK) {
-			if (requestCode == Constants.ADD_TASK) {
-				String result = data.getStringExtra("task");
-				if (result != null) {
-					Task task = Task.fromJSON(result);
-					task = database.addTask(task);
-					tasks.add(task);
-//   					mAdapter.add(task);
+			String result = data.getStringExtra("task");
+			if (result != null) {
+				Task task = Task.fromJSON(result);
+				if (requestCode == Constants.ADD_TASK) {
+					createTask(task);
+				} else if (requestCode == Constants.EDIT_TASK) {
+					editTask(task);
 				}
-			} else if (requestCode == Constants.ADD_TASK) {
-				//TODO : Modify old task
-//				String result = data.getStringExtra("task");
-//				if (result != null) {
-//					Task task = Task.fromJSON(result);
-//					task = database.addTask(task);
-//					taskList.addTask(task);
-//				}
 			}
 		}
 	}
 
 	private List<Tab> createFragments() {
 		List<Tab> fList = new ArrayList<>();
-		Fragment listAllFragment = ListAllFragment.newInstance();
-		Fragment tmpFragment = ListAllFragment.newInstance();
+		TaskListFragment listAllFragment = ListFragmentAllFragment.newInstance();
+		TaskListFragment tmpFragment = ListFragmentAllFragment.newInstance();
 
 
 		ArrayList<String> list = new ArrayList<>();
-		for (Task task : tasks) {
+		for (Task task : mTasks) {
 			list.add(task.toJSON());
 		}
 
@@ -110,31 +105,49 @@ public class ListActivity extends AppCompatActivity {
 		return fList;
 	}
 
-	public boolean editTask(View view) {
-//		int pos = taskList.getList().getPositionForView(view);
-//		Task task = mAdapter.getItem(pos);
-//		if (task != null) {
-//			Intent createTask = new Intent(this, CreateTaskActivity.class);
-//			createTask.putExtra("task", task.toJSON());
-//			startActivityForResult(createTask, Constants.EDIT_TASK);
-//		}
-		return true;
+	private void createTask(Task task) {
+		task = mDatabase.addTask(task);
+		mTasks.add(task);
+		for (Tab tab : mTabs) {
+			TaskListFragment taskListFragment = tab.getFragment();
+			taskListFragment.createTask(task);
+		}
 	}
 
-	public boolean createTask() {
-		Intent createTask = new Intent(this, CreateTaskActivity.class);
-		startActivityForResult(createTask, Constants.ADD_TASK);
-		return true;
+	private void editTask(Task task) {
+		mDatabase.editTask(task);
+		mTasks.remove(task);
+		mTasks.add(task);
+		for (Tab tab : mTabs) {
+			TaskListFragment taskListFragment = tab.getFragment();
+			taskListFragment.editTask(task);
+		}
+
 	}
 
 	public void deleteTask(View view) {
-		Log.d("Lol", "Mdr");
-//		int pos = taskList.getList().getPositionForView(view);
-//		Task task = mAdapter.getItem(pos);
-//		if (task != null) {
-//			database.deleteTask(task);
-//			mAdapter.remove(task);
-//			mAdapter.notifyDataSetChanged();
-//		}
+		Task task = mTabs.get(0).getFragment().getTask(view);
+		if (task != null) {
+			mDatabase.deleteTask(task);
+			mTasks.remove(task);
+			for (Tab tab : mTabs) {
+				TaskListFragment taskListFragment = tab.getFragment();
+				taskListFragment.deleteTask(task);
+			}
+		}
+	}
+
+	public void callCreateTaskActivity() {
+		Intent createTask = new Intent(this, CreateTaskActivity.class);
+		startActivityForResult(createTask, Constants.ADD_TASK);
+	}
+
+	public void callEditTaskActivity(View view) {
+		Task task = mTabs.get(0).getFragment().getTask(view);
+		if (task != null) {
+			Intent callCreateTaskActivity = new Intent(this, CreateTaskActivity.class);
+			callCreateTaskActivity.putExtra("task", task.toJSON());
+			startActivityForResult(callCreateTaskActivity, Constants.EDIT_TASK);
+		}
 	}
 }

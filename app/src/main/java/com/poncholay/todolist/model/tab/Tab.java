@@ -1,6 +1,6 @@
 package com.poncholay.todolist.model.tab;
 
-import android.support.v4.app.Fragment;
+import com.poncholay.todolist.Activities.List.Fragments.TaskListFragment;
 
 /**
  * Created by wilmot_g on 14/01/17.
@@ -9,14 +9,14 @@ import android.support.v4.app.Fragment;
 public class Tab {
 
 	private String mTitle;
-	private Fragment mFragment;
+	private TaskListFragment mFragment;
 
-	public Tab(String title, Fragment fragment) {
+	public Tab(String title, TaskListFragment fragment) {
 		mTitle = title;
 		mFragment = fragment;
 	}
 
-	public Fragment getFragment() {
+	public TaskListFragment getFragment() {
 		return mFragment;
 	}
 

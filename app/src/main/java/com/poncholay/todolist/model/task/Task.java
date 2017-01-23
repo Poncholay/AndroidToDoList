@@ -3,9 +3,6 @@ package com.poncholay.todolist.model.task;
 import android.util.Log;
 
 import com.poncholay.todolist.DateUtils;
-import com.poncholay.todolist.R;
-import com.quemb.qmbform.annotation.FormElement;
-import com.quemb.qmbform.descriptor.RowDescriptor;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,6 +10,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by wilmot_g on 13/01/17.
@@ -40,6 +38,16 @@ public class Task implements Serializable {
 		this.title = title;
 		this.content = content;
 		this.date = date;
+	}
+
+	@Override
+	public boolean equals(Object task) {
+		if (task == null || !Task.class.isAssignableFrom(task.getClass())) {
+			return false;
+		}
+		final Task other = (Task) task;
+		Log.d("Test", "comparing " + other.getId() + " and " + this.id);
+		return Objects.equals(other.getId(), this.id);
 	}
 
 	public String getTitle() {

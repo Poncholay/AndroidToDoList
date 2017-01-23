@@ -9,8 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.poncholay.todolist.DateUtils;
-import com.poncholay.todolist.model.task.Task;
 import com.poncholay.todolist.R;
+import com.poncholay.todolist.model.task.Task;
 
 import java.util.ArrayList;
 

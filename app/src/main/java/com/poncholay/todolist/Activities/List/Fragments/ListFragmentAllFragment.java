@@ -1,12 +1,9 @@
-package com.poncholay.todolist.Activities.List.Views;
+package com.poncholay.todolist.Activities.List.Fragments;
 
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.poncholay.todolist.R;
@@ -20,16 +17,11 @@ import java.util.List;
  * Created by wilmot_g on 18/01/17.
  */
 
-public class ListAllFragment extends Fragment {
+public class ListFragmentAllFragment extends TaskListFragment {
 
-	ListView mListView;
-	ArrayList<Task> mTaskList;
-	private ArrayAdapter<Task> mAdapter;
-
-	public static ListAllFragment newInstance() {
-		return new ListAllFragment();
+	public static ListFragmentAllFragment newInstance() {
+		return new ListFragmentAllFragment();
 	}
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

@@ -8,9 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Created by wilmot_g on 11/01/17.
  */
 
-public class TaskDbHelper extends SQLiteOpenHelper {
+public class DatabaseHelper extends SQLiteOpenHelper {
 
-	public TaskDbHelper(Context context) {
+	public DatabaseHelper(Context context) {
 		super(context, TaskContract.DB_NAME, null, TaskContract.DB_VERSION);
 	}
 

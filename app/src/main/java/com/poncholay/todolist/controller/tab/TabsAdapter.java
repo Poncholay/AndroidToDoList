@@ -3,7 +3,6 @@ package com.poncholay.todolist.controller.tab;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.view.View;
 
 import com.poncholay.todolist.model.tab.Tab;
 

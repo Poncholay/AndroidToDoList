@@ -14,16 +14,16 @@ import java.util.ArrayList;
  * Created by wilmot_g on 11/01/17.
  */
 
-public class TaskActions {
+public class DatabaseActions {
 
-	private TaskDbHelper taskDbHelper;
+	private DatabaseHelper databaseHelper;
 
-	public TaskActions(TaskDbHelper taskDbHelper) {
-		this.taskDbHelper = taskDbHelper;
+	public DatabaseActions(DatabaseHelper databaseHelper) {
+		this.databaseHelper = databaseHelper;
 	}
 
 	public Task addTask(Task task) {
-		SQLiteDatabase db = taskDbHelper.getWritableDatabase();
+		SQLiteDatabase db = databaseHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task.getTitle());
 		if (task.getContent() != null) {
@@ -41,17 +41,39 @@ public class TaskActions {
 		return id == -1 ? null : task;
 	}
 
-	public void deleteTask(Task task) {
-		SQLiteDatabase db = taskDbHelper.getWritableDatabase();
-		db.delete(TaskContract.TaskEntry.TABLE,
+	public void editTask(Task task) {
+		SQLiteDatabase db = databaseHelper.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task.getTitle());
+		if (task.getContent() != null) {
+			values.put(TaskContract.TaskEntry.COL_TASK_CONTENT, task.getContent());
+		}
+		if (task.getDate() != null) {
+			values.put(TaskContract.TaskEntry.COL_TASK_DATE, DateUtils.toString(task.getDate()));
+		}
+		db.updateWithOnConflict(
+				TaskContract.TaskEntry.TABLE,
+				values,
 				TaskContract.TaskEntry._ID + " = ?",
-				new String[]{task.getId().toString()});
+				new String[]{task.getId().toString()},
+				SQLiteDatabase.CONFLICT_REPLACE
+		);
+		db.close();
+	}
+
+	public void deleteTask(Task task) {
+		SQLiteDatabase db = databaseHelper.getWritableDatabase();
+		db.delete(
+				TaskContract.TaskEntry.TABLE,
+				TaskContract.TaskEntry._ID + " = ?",
+				new String[]{task.getId().toString()}
+		);
 		db.close();
 	}
 
 	public ArrayList<Task> getTasks() {
 		ArrayList<Task> taskList = new ArrayList<>();
-		SQLiteDatabase db = taskDbHelper.getReadableDatabase();
+		SQLiteDatabase db = databaseHelper.getReadableDatabase();
 		Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
 				new String[] {
 						TaskContract.TaskEntry._ID,
