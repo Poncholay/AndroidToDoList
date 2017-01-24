@@ -17,10 +17,10 @@
 		pv:shadow_width="30dp"
 		android:layout_alignParentTop="true">
 			<android.support.v4.view.PagerTitleStrip
-			android:layout_width="wrap_content"
-			android:padding="@dimen/qmb_padding"
-			android:layout_height="wrap_content"
-			android:background="@drawable/textlines"
-			android:layout_gravity="top" />
+				android:layout_width="wrap_content"
+				android:padding="@dimen/qmb_padding"
+				android:layout_height="wrap_content"
+				android:background="@drawable/textlines"
+				android:layout_gravity="top" />
 	</com.github.ybq.parallaxviewpager.ParallaxViewPager>
 </RelativeLayout>

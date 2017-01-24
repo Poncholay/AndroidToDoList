@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.poncholay.todolist.model.task.Task;
+
 /**
  * Created by wilmot_g on 11/01/17.
  */
@@ -18,6 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		String createTable = "CREATE TABLE " + TaskContract.TaskEntry.TABLE + " ( " +
 				TaskContract.TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+				TaskContract.TaskEntry.COL_TASK_DONE + " INTEGER, " +
 				TaskContract.TaskEntry.COL_TASK_TITLE + " TEXT NOT NULL, " +
 				TaskContract.TaskEntry.COL_TASK_CONTENT + " TEXT, " +
 				TaskContract.TaskEntry.COL_TASK_DATE + " TEXT);";

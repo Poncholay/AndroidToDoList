@@ -16,5 +16,6 @@ class TaskContract {
 		static final String COL_TASK_TITLE = "title";
 		static final String COL_TASK_CONTENT = "content";
 		static final String COL_TASK_DATE = "date";
+		static final String COL_TASK_DONE = "done";
 	}
 }

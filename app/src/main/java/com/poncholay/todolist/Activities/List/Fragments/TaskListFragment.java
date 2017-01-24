@@ -5,12 +5,15 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.poncholay.todolist.Activities.List.ListActivity;
 import com.poncholay.todolist.model.task.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by wilmot_g on 23/01/17.
@@ -19,38 +22,61 @@ import java.util.ArrayList;
 public class TaskListFragment extends Fragment {
 
 	protected ListView mListView;
-	protected ArrayList<Task> mTaskList;
 	protected ArrayAdapter<Task> mAdapter;
-
-	public Task getTask(View view) {
-		if (mListView != null) {
-			int pos = mListView.getPositionForView(view);
-			if (mAdapter != null) {
-				return mAdapter.getItem(pos);
-			}
-		}
-		return null;
-	}
+	Boolean done;
 
 	public void deleteTask(Task task) {
-		if (mAdapter != null) {
+		if (mAdapter != null && task != null) {
 			mAdapter.remove(task);
 			mAdapter.notifyDataSetChanged();
 		}
 	}
 
 	public void editTask(Task task) {
-		if (mAdapter != null) {
+		if (mAdapter != null && task != null) {
+			int pos = mAdapter.getPosition(task);
 			mAdapter.remove(task);
-			mAdapter.add(task);
+			if (task.getDone() == done) {
+				mAdapter.insert(task, pos == -1 ? mAdapter.getCount() : pos);
+			}
 			mAdapter.notifyDataSetChanged();
 		}
 	}
 
 	public void createTask(Task task) {
-		if (mAdapter != null) {
-			mAdapter.add(task);
-			mAdapter.notifyDataSetChanged();
+		if (mAdapter != null && task != null) {
+			if (task.getDone() == done) {
+				mAdapter.add(task);
+				mAdapter.notifyDataSetChanged();
+			}
+		}
+	}
+
+	protected void addClickListeners() {
+		mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> av, View v, int pos, long id) {
+				((ListActivity) getActivity()).showTaskMenu(mAdapter.getItem(pos));
+				return true;
+			}
+		});
+		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> av, View v, int pos, long id) {
+				((ListActivity) getActivity()).callEditTaskActivity(mAdapter.getItem(pos));
+			}
+		});
+	}
+
+	protected void retrieveTasks(Bundle state) {
+		this.done = state != null && state.getBoolean("done");
+		if (getActivity() != null) {
+			List<Task> tasks = ((ListActivity) getActivity()).getTasks();
+			for (Task task : tasks) {
+				if (task.getDone() == done) {
+					mAdapter.add(task);
+				}
+			}
 		}
 	}
 
@@ -72,46 +98,6 @@ public class TaskListFragment extends Fragment {
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
+		outState.putBoolean("done", done);
 	}
 }
-
-
-//	private ListView mTaskListView;
-//	private ArrayAdapter<Task> mAdapter;
-//
-//	public TaskListFragment(ListView view) {
-//		mTaskListView = view ;
-//	}
-//
-//	public void createAdapter(Activity main, ArrayList<Task> taskList) {
-//		mAdapter = new TasksAdapter(main, taskList);
-//		mTaskListView.setAdapter(mAdapter);
-//	}
-//
-//	public void update(List<Task> taskList) {
-//		mAdapter.clear();
-//		mAdapter.addAll(taskList);
-//		mAdapter.notifyDataSetChanged();
-//	}
-//
-//	public void addTask(Task task) {
-//		if (task != null) {
-//			mAdapter.add(task);
-//			mAdapter.notifyDataSetChanged();
-//		}
-//	}
-//
-//	public void deleteTask(Task task) {
-//		if (task != null) {
-//			mAdapter.remove(task);
-//			mAdapter.notifyDataSetChanged();
-//		}
-//	}
-//
-//	public ListView getList() {
-//		return mTaskListView;
-//	}
-//
-//	public ArrayAdapter<Task> getAdapter() {
-//		return mAdapter;
-//	}

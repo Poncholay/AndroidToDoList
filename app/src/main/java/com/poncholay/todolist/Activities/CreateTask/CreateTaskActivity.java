@@ -1,13 +1,18 @@
 package com.poncholay.todolist.Activities.CreateTask;
 
 import android.app.Activity;
+import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.poncholay.todolist.R;
@@ -126,8 +131,6 @@ public class CreateTaskActivity extends AppCompatActivity implements OnFormRowVa
 	}
 
 	private void createForm() {
-		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-
 		ListView mListView = (ListView) findViewById(R.id.form);
 
 		HashMap<String, Object> cellConfig = new HashMap<>(2);
@@ -143,6 +146,7 @@ public class CreateTaskActivity extends AppCompatActivity implements OnFormRowVa
 		titleRow = RowDescriptor.newInstance("title", RowDescriptor.FormRowDescriptorTypeText, "Title", new Value<>(task.getTitle()));
 		titleRow.addValidator(new BlankValidator());
 		sectionDescriptor.addRow(titleRow);
+
 		final RowDescriptor contentRow = RowDescriptor.newInstance("content", RowDescriptor.FormRowDescriptorTypeTextView, "Content", new Value<>(task.getContent()));
 		sectionDescriptor.addRow(contentRow);
 

@@ -19,7 +19,8 @@
 			</intent-filter>
 		</activity>
         <activity android:name=".Activities.List.ListActivity"/>
-		<activity android:name=".Activities.CreateTask.CreateTaskActivity"/>
+		<activity android:name=".Activities.CreateTask.CreateTaskActivity"
+				  android:windowSoftInputMode="adjustPan"/>
     </application>
 
 </manifest>

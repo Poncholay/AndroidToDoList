@@ -26,6 +26,7 @@ public class DatabaseActions {
 		SQLiteDatabase db = databaseHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task.getTitle());
+		values.put(TaskContract.TaskEntry.COL_TASK_DONE, task.getDone());
 		if (task.getContent() != null) {
 			values.put(TaskContract.TaskEntry.COL_TASK_CONTENT, task.getContent());
 		}
@@ -45,6 +46,7 @@ public class DatabaseActions {
 		SQLiteDatabase db = databaseHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task.getTitle());
+		values.put(TaskContract.TaskEntry.COL_TASK_DONE, task.getDone());
 		if (task.getContent() != null) {
 			values.put(TaskContract.TaskEntry.COL_TASK_CONTENT, task.getContent());
 		}
@@ -77,6 +79,7 @@ public class DatabaseActions {
 		Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
 				new String[] {
 						TaskContract.TaskEntry._ID,
+						TaskContract.TaskEntry.COL_TASK_DONE,
 						TaskContract.TaskEntry.COL_TASK_TITLE,
 						TaskContract.TaskEntry.COL_TASK_CONTENT,
 						TaskContract.TaskEntry.COL_TASK_DATE
@@ -88,6 +91,12 @@ public class DatabaseActions {
 				task.setId(cursor.getLong(idx));
 			} else {
 				continue;
+			}
+			idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_DONE);
+			if (idx != - 1) {
+				task.setDone(cursor.getInt(idx) > 0);
+			} else {
+				task.setDone(false);
 			}
 			idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
 			if (idx != - 1) {

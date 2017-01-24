@@ -2,17 +2,22 @@ package com.poncholay.todolist.Activities.List;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.ybq.parallaxviewpager.Mode;
 import com.github.ybq.parallaxviewpager.ParallaxViewPager;
 import com.poncholay.todolist.Activities.CreateTask.CreateTaskActivity;
-import com.poncholay.todolist.Activities.List.Fragments.ListFragmentAllFragment;
+import com.poncholay.todolist.Activities.List.Fragments.TaskListFragmentAll;
 import com.poncholay.todolist.Activities.List.Fragments.TaskListFragment;
+import com.poncholay.todolist.Activities.List.Fragments.TaskListFragmentDone;
 import com.poncholay.todolist.Constants;
 import com.poncholay.todolist.R;
 import com.poncholay.todolist.controller.db.DatabaseActions;
@@ -32,19 +37,19 @@ public class ListActivity extends AppCompatActivity {
 
 	private DatabaseActions mDatabase;
 	private List<Task> mTasks;
-	private List<Tab> mTabs;
 
 	private static final String TAG = "ListActivity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_list);
 
 		mDatabase = new DatabaseActions(new DatabaseHelper(this));
-		mTasks = mDatabase.getTasks();
+		mTasks = retrieveTasks(savedInstanceState);
 
-		mTabs = createFragments();
+		super.onCreate(savedInstanceState);
+
+		List<Tab> mTabs = createFragments(savedInstanceState);
 		ParallaxViewPager mParallaxViewPager = (ParallaxViewPager) findViewById(R.id.viewpager);
 		TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager(), mTabs);
 		mParallaxViewPager.setAdapter(tabsAdapter);
@@ -84,56 +89,119 @@ public class ListActivity extends AppCompatActivity {
 		}
 	}
 
-	private List<Tab> createFragments() {
-		List<Tab> fList = new ArrayList<>();
-		TaskListFragment listAllFragment = ListFragmentAllFragment.newInstance();
-		TaskListFragment tmpFragment = ListFragmentAllFragment.newInstance();
-
-
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
 		ArrayList<String> list = new ArrayList<>();
 		for (Task task : mTasks) {
 			list.add(task.toJSON());
 		}
+		outState.putStringArrayList("tasks", list);
+		super.onSaveInstanceState(outState);
+	}
 
-		Bundle bundle = new Bundle();
-		bundle.putStringArrayList("tasks", list);
+	private List<Task> retrieveTasks(Bundle bundle) {
+		if (bundle != null) {
+			List<String> JSONtasks = bundle.getStringArrayList("tasks");
+			List<Task> tasks = new ArrayList<>();
+			if (JSONtasks != null) {
+				for (String json : JSONtasks) {
+					Task task = Task.fromJSON(json);
+					tasks.add(task);
+				}
+			}
+			return tasks;
+		} else {
+			return mDatabase.getTasks();
+		}
+	}
 
-		listAllFragment.setArguments(bundle);
-		tmpFragment.setArguments(bundle);
-		fList.add(new Tab("All", listAllFragment));
-		fList.add(new Tab("By Month", tmpFragment));
+	private List<Tab> createFragments(Bundle bundle) {
+		List<Tab> fList = new ArrayList<>();
+		if (bundle == null) {
+			TaskListFragment listAllFragment = TaskListFragmentAll.newInstance();
+			TaskListFragment listDoneFragment = TaskListFragmentDone.newInstance();
+			TaskListFragment tmpFragment = TaskListFragmentAll.newInstance();
+
+			fList.add(new Tab("All", listAllFragment));
+			fList.add(new Tab("Done", listDoneFragment));
+			fList.add(new Tab("By Month", tmpFragment));
+
+			Bundle args = new Bundle();
+			args.putBoolean("done", true);
+			listDoneFragment.setArguments(args);
+		} else {
+			fList.add(new Tab("All", (TaskListFragment) getSupportFragmentManager().getFragments().get(0)));
+			fList.add(new Tab("Done", (TaskListFragment) getSupportFragmentManager().getFragments().get(1)));
+			fList.add(new Tab("By Month", (TaskListFragment) getSupportFragmentManager().getFragments().get(2)));
+		}
+
 		return fList;
 	}
 
 	private void createTask(Task task) {
 		task = mDatabase.addTask(task);
 		mTasks.add(task);
-		for (Tab tab : mTabs) {
-			TaskListFragment taskListFragment = tab.getFragment();
+		for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+			TaskListFragment taskListFragment = (TaskListFragment) fragment;
 			taskListFragment.createTask(task);
 		}
+	}
+
+	private void flagTaskDone(Task task) {
+		task.setDone(true);
+		editTask(task);
 	}
 
 	private void editTask(Task task) {
 		mDatabase.editTask(task);
 		mTasks.remove(task);
 		mTasks.add(task);
-		for (Tab tab : mTabs) {
-			TaskListFragment taskListFragment = tab.getFragment();
+		for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+			TaskListFragment taskListFragment = (TaskListFragment) fragment;
 			taskListFragment.editTask(task);
 		}
 
 	}
 
-	public void deleteTask(View view) {
-		Task task = mTabs.get(0).getFragment().getTask(view);
+	public void deleteTask(Task task) {
+		mDatabase.deleteTask(task);
+		mTasks.remove(task);
+		for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+			TaskListFragment taskListFragment = (TaskListFragment) fragment;
+			taskListFragment.deleteTask(task);
+		}
+	}
+
+	public void showTaskMenu(final Task task) {
 		if (task != null) {
-			mDatabase.deleteTask(task);
-			mTasks.remove(task);
-			for (Tab tab : mTabs) {
-				TaskListFragment taskListFragment = tab.getFragment();
-				taskListFragment.deleteTask(task);
+			String title = task.getTitle();
+			if (title.length() >= 25 + 3) {
+				title = title.substring(0, 25) + "...";
 			}
+			MaterialDialog.Builder materialDialog = new MaterialDialog.Builder(this);
+			materialDialog.title(title).neutralText("Cancel");
+			if (task.getContent() != null) {
+				String content = task.getContent();
+				if (content.length() >= 40 + 3) {
+					content = content.substring(0, 40) + "...";
+				}
+				materialDialog.content(content);
+			}
+			if (!task.getDone()) {
+				materialDialog.positiveText("Done").onPositive(new MaterialDialog.SingleButtonCallback() {
+					@Override
+					public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+						flagTaskDone(task);
+					}
+				});
+			}
+			materialDialog.negativeText("Delete").onNegative(new MaterialDialog.SingleButtonCallback() {
+				@Override
+				public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+					deleteTask(task);
+				}
+			});
+			materialDialog.build().show();
 		}
 	}
 
@@ -142,12 +210,15 @@ public class ListActivity extends AppCompatActivity {
 		startActivityForResult(createTask, Constants.ADD_TASK);
 	}
 
-	public void callEditTaskActivity(View view) {
-		Task task = mTabs.get(0).getFragment().getTask(view);
+	public void callEditTaskActivity(Task task) {
 		if (task != null) {
 			Intent callCreateTaskActivity = new Intent(this, CreateTaskActivity.class);
 			callCreateTaskActivity.putExtra("task", task.toJSON());
 			startActivityForResult(callCreateTaskActivity, Constants.EDIT_TASK);
 		}
+	}
+
+	public List<Task> getTasks() {
+		return mTasks;
 	}
 }

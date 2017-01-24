@@ -21,6 +21,7 @@ public class Task implements Serializable {
 	private String title;
 	private String content;
 	private Date date;
+	private Boolean done;
 
 	public Task() {
 		this(null, null, null);
@@ -38,6 +39,7 @@ public class Task implements Serializable {
 		this.title = title;
 		this.content = content;
 		this.date = date;
+		this.done = false;
 	}
 
 	@Override
@@ -55,7 +57,7 @@ public class Task implements Serializable {
 	}
 
 	public void setTitle(String title) {
-		this.title = title;
+		this.title = title.substring(0, 1).toUpperCase() + title.substring(1);
 	}
 
 	public String getContent() {
@@ -82,10 +84,19 @@ public class Task implements Serializable {
 		this.id = id;
 	}
 
+	public Boolean getDone() {
+		return done;
+	}
+
+	public void setDone(Boolean done) {
+		this.done = done;
+	}
+
 	public String toJSON() {
 		JSONObject jsonObject = new JSONObject();
 		try {
 			jsonObject.put("Id", id == null ? null : this.id.toString());
+			jsonObject.put("Done", done);
 			jsonObject.put("Title", this.title);
 			jsonObject.put("Content", this.content);
 			jsonObject.put("Date", DateUtils.toString(this.date));
@@ -103,6 +114,7 @@ public class Task implements Serializable {
 			if (jsonObject.has("Id")) {
 				task.setId(Long.parseLong(jsonObject.getString("Id")));
 			}
+			task.setDone(jsonObject.getBoolean("Done"));
 			task.setTitle(jsonObject.getString("Title"));
 			if (jsonObject.has("Content")) {
 				task.setContent(jsonObject.getString("Content"));
