@@ -36,5 +36,10 @@ dependencies {
     compile 'com.afollestad.material-dialogs:core:0.9.2.3'
     //Forms
     compile project(":lib:QMBForm")
+    //Tests
     testCompile 'junit:junit:4.12'
+    testCompile 'org.powermock:powermock:1.6.5'
+    testCompile 'org.powermock:powermock-module-junit4:1.6.5'
+    testCompile 'org.powermock:powermock-api-mockito:1.6.5'
+    testCompile 'org.json:json:20140107'
 }

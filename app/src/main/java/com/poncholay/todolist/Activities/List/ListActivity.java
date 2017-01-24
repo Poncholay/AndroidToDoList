@@ -27,6 +27,8 @@ import com.poncholay.todolist.model.task.Task;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: Sort, Categorie, Calendar view, Vocal recognition, Push notification
+
 public class ListActivity extends AppCompatActivity {
 
 	private DatabaseActions mDatabase;

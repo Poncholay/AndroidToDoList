@@ -44,8 +44,12 @@ public class Task implements Serializable {
 			return false;
 		}
 		final Task other = (Task) task;
-		Log.d("Test", "comparing " + other.getId() + " and " + this.id);
 		return Objects.equals(other.getId(), this.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return 42 * (int)(id ^ (id >>> 32));
 	}
 
 	public String getTitle() {
@@ -54,7 +58,11 @@ public class Task implements Serializable {
 
 	public void setTitle(String title) {
 		if (title != null) {
-			this.title = title.substring(0, 1).toUpperCase() + title.substring(1);
+			if (title.length() > 0) {
+				this.title = title.substring(0, 1).toUpperCase() + title.substring(1);
+			} else {
+				this.title = title;
+			}
 		}
 	}
 
@@ -64,7 +72,11 @@ public class Task implements Serializable {
 
 	public void setContent(String content) {
 		if (content != null) {
-			this.content = content.substring(0, 1).toUpperCase() + content.substring(1);
+			if (content.length() > 0) {
+				this.content = content.substring(0, 1).toUpperCase() + content.substring(1);
+			} else {
+				this.content = content;
+			}
 		}
 	}
 
@@ -89,7 +101,9 @@ public class Task implements Serializable {
 	}
 
 	public void setDone(Boolean done) {
-		this.done = done;
+		if (done != null) {
+			this.done = done;
+		}
 	}
 
 	public String toJSON() {
@@ -130,5 +144,16 @@ public class Task implements Serializable {
 			Log.d("Task", "Error while unserializing from JSON");
 		}
 		return task;
+	}
+
+	public boolean compare(Task other) {
+		return other != null &&
+				Objects.equals(this.id, other.getId()) &&
+				Objects.equals(this.title, other.getTitle()) &&
+				Objects.equals(this.content, other.getContent()) &&
+				Objects.equals(this.done, other.getDone()) &&
+				(Objects.equals(this.date, other.getDate()) ||
+						(this.date != null && other.getDate() != null && Math.abs(this.date.getTime() - other.getDate().getTime()) < 10000)
+				);
 	}
 }
