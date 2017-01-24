@@ -5,18 +5,16 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.ybq.parallaxviewpager.Mode;
 import com.github.ybq.parallaxviewpager.ParallaxViewPager;
 import com.poncholay.todolist.Activities.CreateTask.CreateTaskActivity;
-import com.poncholay.todolist.Activities.List.Fragments.TaskListFragmentAll;
 import com.poncholay.todolist.Activities.List.Fragments.TaskListFragment;
+import com.poncholay.todolist.Activities.List.Fragments.TaskListFragmentAll;
 import com.poncholay.todolist.Activities.List.Fragments.TaskListFragmentDone;
 import com.poncholay.todolist.Constants;
 import com.poncholay.todolist.R;
@@ -130,11 +128,11 @@ public class ListActivity extends AppCompatActivity {
 			args.putBoolean("done", true);
 			listDoneFragment.setArguments(args);
 		} else {
-			fList.add(new Tab("All", (TaskListFragment) getSupportFragmentManager().getFragments().get(0)));
-			fList.add(new Tab("Done", (TaskListFragment) getSupportFragmentManager().getFragments().get(1)));
-			fList.add(new Tab("By Month", (TaskListFragment) getSupportFragmentManager().getFragments().get(2)));
+			List<Fragment> fragments = getSupportFragmentManager().getFragments();
+			fList.add(new Tab("All", fragments.size() > 0 ? (TaskListFragment) fragments.get(0) : TaskListFragmentAll.newInstance()));
+			fList.add(new Tab("Done", fragments.size() > 1 ? (TaskListFragment) fragments.get(1) : TaskListFragmentDone.newInstance()));
+			fList.add(new Tab("Calendar", fragments.size() > 2 ? (TaskListFragment) fragments.get(2) : TaskListFragmentAll.newInstance()));
 		}
-
 		return fList;
 	}
 
@@ -148,7 +146,7 @@ public class ListActivity extends AppCompatActivity {
 	}
 
 	private void flagTaskDone(Task task) {
-		task.setDone(true);
+		task.setDone(!task.getDone());
 		editTask(task);
 	}
 
@@ -174,27 +172,28 @@ public class ListActivity extends AppCompatActivity {
 
 	public void showTaskMenu(final Task task) {
 		if (task != null) {
+			MaterialDialog.Builder materialDialog = new MaterialDialog.Builder(this);
+
 			String title = task.getTitle();
 			if (title.length() >= 25 + 3) {
 				title = title.substring(0, 25) + "...";
 			}
-			MaterialDialog.Builder materialDialog = new MaterialDialog.Builder(this);
-			materialDialog.title(title).neutralText("Cancel");
-			if (task.getContent() != null) {
-				String content = task.getContent();
-				if (content.length() >= 40 + 3) {
-					content = content.substring(0, 40) + "...";
+			materialDialog.title(title);
+
+			String content = task.getContent();
+			content = content == null ? "No description" : content;
+			if (content.length() >= 30 + 3) {
+				content = content.substring(0, 40) + "...";
+			}
+			materialDialog.content(content);
+
+			materialDialog.neutralText("Cancel");
+			materialDialog.positiveText(task.getDone() ? "Uncomplete" : "Complete").onPositive(new MaterialDialog.SingleButtonCallback() {
+				@Override
+				public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+					flagTaskDone(task);
 				}
-				materialDialog.content(content);
-			}
-			if (!task.getDone()) {
-				materialDialog.positiveText("Done").onPositive(new MaterialDialog.SingleButtonCallback() {
-					@Override
-					public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-						flagTaskDone(task);
-					}
-				});
-			}
+			});
 			materialDialog.negativeText("Delete").onNegative(new MaterialDialog.SingleButtonCallback() {
 				@Override
 				public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {

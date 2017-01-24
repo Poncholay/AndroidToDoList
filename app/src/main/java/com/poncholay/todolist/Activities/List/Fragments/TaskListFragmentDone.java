@@ -11,7 +11,6 @@ import com.poncholay.todolist.controller.task.TasksAdapter;
 import com.poncholay.todolist.model.task.Task;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by wilmot_g on 24/01/17.

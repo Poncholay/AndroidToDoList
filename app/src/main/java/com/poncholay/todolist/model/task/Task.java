@@ -57,7 +57,9 @@ public class Task implements Serializable {
 	}
 
 	public void setTitle(String title) {
-		this.title = title.substring(0, 1).toUpperCase() + title.substring(1);
+		if (title != null) {
+			this.title = title.substring(0, 1).toUpperCase() + title.substring(1);
+		}
 	}
 
 	public String getContent() {
@@ -65,7 +67,9 @@ public class Task implements Serializable {
 	}
 
 	public void setContent(String content) {
-		this.content = content;
+		if (content != null) {
+			this.content = content.substring(0, 1).toUpperCase() + content.substring(1);
+		}
 	}
 
 	public Date getDate() {

@@ -12,7 +12,6 @@ import android.widget.ListView;
 import com.poncholay.todolist.Activities.List.ListActivity;
 import com.poncholay.todolist.model.task.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
