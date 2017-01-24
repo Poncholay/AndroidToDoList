@@ -2,10 +2,6 @@ package com.poncholay.todolist.controller.db;
 
 import android.provider.BaseColumns;
 
-/**
- * Created by wilmot_g on 11/01/17.
- */
-
 class TaskContract {
 	static final String DB_NAME = "com.poncholay.todolist.controller.db";
 	static final int DB_VERSION = 1;

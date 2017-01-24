@@ -12,10 +12,6 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Objects;
 
-/**
- * Created by wilmot_g on 13/01/17.
- */
-
 public class Task implements Serializable {
 	private Long id;
 	private String title;

@@ -27,16 +27,10 @@ import com.poncholay.todolist.model.task.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by wilmot_g on 10/01/17.
- */
-
 public class ListActivity extends AppCompatActivity {
 
 	private DatabaseActions mDatabase;
 	private List<Task> mTasks;
-
-	private static final String TAG = "ListActivity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -161,7 +155,7 @@ public class ListActivity extends AppCompatActivity {
 
 	}
 
-	public void deleteTask(Task task) {
+	private void deleteTask(Task task) {
 		mDatabase.deleteTask(task);
 		mTasks.remove(task);
 		for (Fragment fragment : getSupportFragmentManager().getFragments()) {
@@ -204,7 +198,7 @@ public class ListActivity extends AppCompatActivity {
 		}
 	}
 
-	public void callCreateTaskActivity() {
+	private void callCreateTaskActivity() {
 		Intent createTask = new Intent(this, CreateTaskActivity.class);
 		startActivityForResult(createTask, Constants.ADD_TASK);
 	}

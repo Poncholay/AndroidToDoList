@@ -8,12 +8,8 @@ import com.poncholay.todolist.model.tab.Tab;
 
 import java.util.List;
 
-/**
- * Created by wilmot_g on 14/01/17.
- */
-
 public class TabsAdapter extends FragmentPagerAdapter {
-	private List<Tab> mTabs;
+	final private List<Tab> mTabs;
 
 	public TabsAdapter(FragmentManager fm, List<Tab> tabs) {
 		super(fm);

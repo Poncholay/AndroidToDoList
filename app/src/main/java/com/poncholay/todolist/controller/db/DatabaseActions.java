@@ -10,13 +10,9 @@ import com.poncholay.todolist.model.task.Task;
 import java.text.ParseException;
 import java.util.ArrayList;
 
-/**
- * Created by wilmot_g on 11/01/17.
- */
-
 public class DatabaseActions {
 
-	private DatabaseHelper databaseHelper;
+	final private DatabaseHelper databaseHelper;
 
 	public DatabaseActions(DatabaseHelper databaseHelper) {
 		this.databaseHelper = databaseHelper;

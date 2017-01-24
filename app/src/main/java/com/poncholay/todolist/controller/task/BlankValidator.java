@@ -6,10 +6,6 @@ import com.quemb.qmbform.descriptor.RowDescriptor;
 import com.quemb.qmbform.descriptor.RowValidationError;
 import com.quemb.qmbform.descriptor.Value;
 
-/**
- * Created by wilmot_g on 16/01/17.
- */
-
 public class BlankValidator implements FormValidator {
 	@Override
 	public RowValidationError validate(RowDescriptor descriptor) {

@@ -3,24 +3,21 @@ package com.poncholay.todolist;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-/**
- * Created by wilmot_g on 13/01/17.
- */
+import java.util.Locale;
 
 public class DateUtils {
 
 	public static Date toDate(String src) throws ParseException {
 		if (src == null)
 			return null;
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
 		return format.parse(src);
 	}
 
 	public static String toString(Date date) {
 		if (date == null)
 			return null;
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
 		return format.format(date);
 	}
 

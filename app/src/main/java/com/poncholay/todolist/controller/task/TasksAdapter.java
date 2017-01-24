@@ -14,10 +14,6 @@ import com.poncholay.todolist.model.task.Task;
 
 import java.util.ArrayList;
 
-/**
- * Created by wilmot_g on 13/01/17.
- */
-
 public class TasksAdapter extends ArrayAdapter<Task> {
 	public TasksAdapter(Context context, ArrayList<Task> tasks) {
 		super(context, 0, tasks);

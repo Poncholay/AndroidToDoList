@@ -12,10 +12,6 @@ import com.poncholay.todolist.model.task.Task;
 
 import java.util.ArrayList;
 
-/**
- * Created by wilmot_g on 24/01/17.
- */
-
 public class TaskListFragmentDone extends TaskListFragment {
 
 	public static TaskListFragmentAll newInstance() {
@@ -25,7 +21,6 @@ public class TaskListFragmentDone extends TaskListFragment {
 	@Override
 	public void onCreate(Bundle state) {
 		super.onCreate(state);
-//		mTaskList = new ArrayList<>();
 		if (state == null) {
 			state = getArguments();
 		}
@@ -37,19 +32,8 @@ public class TaskListFragmentDone extends TaskListFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_list, container, false);
 		mListView = (ListView) v.findViewById(R.id.list_todo);
-//		mAdapter = new TasksAdapter(getActivity(), mTaskList);
 		mListView.setAdapter(mAdapter);
 		addClickListeners();
 		return v;
-	}
-
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
 	}
 }

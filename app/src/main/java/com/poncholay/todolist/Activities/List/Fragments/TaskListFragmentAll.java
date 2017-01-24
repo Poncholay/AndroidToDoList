@@ -12,10 +12,6 @@ import com.poncholay.todolist.model.task.Task;
 
 import java.util.ArrayList;
 
-/**
- * Created by wilmot_g on 18/01/17.
- */
-
 public class TaskListFragmentAll extends TaskListFragment {
 
 	public static TaskListFragmentAll newInstance() {
@@ -39,15 +35,5 @@ public class TaskListFragmentAll extends TaskListFragment {
 		mListView.setAdapter(mAdapter);
 		addClickListeners();
 		return v;
-	}
-
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
 	}
 }

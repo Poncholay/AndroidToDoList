@@ -2,14 +2,10 @@ package com.poncholay.todolist.model.tab;
 
 import com.poncholay.todolist.Activities.List.Fragments.TaskListFragment;
 
-/**
- * Created by wilmot_g on 14/01/17.
- */
-
 public class Tab {
 
-	private String mTitle;
-	private TaskListFragment mFragment;
+	final private String mTitle;
+	final private TaskListFragment mFragment;
 
 	public Tab(String title, TaskListFragment fragment) {
 		mTitle = title;

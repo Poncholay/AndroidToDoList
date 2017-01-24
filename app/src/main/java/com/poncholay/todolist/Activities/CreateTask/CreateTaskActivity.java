@@ -27,13 +27,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 
-/**
- * Created by wilmot_g on 14/01/17.
- */
-
 public class CreateTaskActivity extends AppCompatActivity implements OnFormRowValueChangedListener, OnFormRowClickListener {
 
-	private HashMap<String, Value<?>> mChangesMap = new HashMap<>();
+	private HashMap<String, Value<?>> mChangesMap;
 	private MenuItem mSaveMenuItem;
 	private FormManager formManager;
 	private Task task;
@@ -44,6 +40,7 @@ public class CreateTaskActivity extends AppCompatActivity implements OnFormRowVa
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_create_task);
 		task = retrieveTask(savedInstanceState);
+		mChangesMap = new HashMap<>();
 		createForm();
 	}
 
@@ -107,7 +104,7 @@ public class CreateTaskActivity extends AppCompatActivity implements OnFormRowVa
 		super.onSaveInstanceState(outState);
 	}
 
-	public void save() {
+	private void save() {
 		if (titleRow.isValid()) {
 			Intent returnIntent = new Intent();
 			if (mChangesMap != null && mChangesMap.size() != 0) {
