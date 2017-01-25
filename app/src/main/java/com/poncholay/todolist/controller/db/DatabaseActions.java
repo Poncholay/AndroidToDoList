@@ -19,6 +19,9 @@ public class DatabaseActions {
 	}
 
 	public Task addTask(Task task) {
+		if (task == null) {
+			return null;
+		}
 		SQLiteDatabase db = databaseHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task.getTitle());
@@ -39,34 +42,38 @@ public class DatabaseActions {
 	}
 
 	public void editTask(Task task) {
-		SQLiteDatabase db = databaseHelper.getWritableDatabase();
-		ContentValues values = new ContentValues();
-		values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task.getTitle());
-		values.put(TaskContract.TaskEntry.COL_TASK_DONE, task.getDone());
-		if (task.getContent() != null) {
-			values.put(TaskContract.TaskEntry.COL_TASK_CONTENT, task.getContent());
+		if (task != null) {
+			SQLiteDatabase db = databaseHelper.getWritableDatabase();
+			ContentValues values = new ContentValues();
+			values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task.getTitle());
+			values.put(TaskContract.TaskEntry.COL_TASK_DONE, task.getDone());
+			if (task.getContent() != null) {
+				values.put(TaskContract.TaskEntry.COL_TASK_CONTENT, task.getContent());
+			}
+			if (task.getDate() != null) {
+				values.put(TaskContract.TaskEntry.COL_TASK_DATE, DateUtils.toString(task.getDate()));
+			}
+			db.updateWithOnConflict(
+					TaskContract.TaskEntry.TABLE,
+					values,
+					TaskContract.TaskEntry._ID + " = ?",
+					new String[]{task.getId().toString()},
+					SQLiteDatabase.CONFLICT_REPLACE
+			);
+			db.close();
 		}
-		if (task.getDate() != null) {
-			values.put(TaskContract.TaskEntry.COL_TASK_DATE, DateUtils.toString(task.getDate()));
-		}
-		db.updateWithOnConflict(
-				TaskContract.TaskEntry.TABLE,
-				values,
-				TaskContract.TaskEntry._ID + " = ?",
-				new String[]{task.getId().toString()},
-				SQLiteDatabase.CONFLICT_REPLACE
-		);
-		db.close();
 	}
 
 	public void deleteTask(Task task) {
-		SQLiteDatabase db = databaseHelper.getWritableDatabase();
-		db.delete(
-				TaskContract.TaskEntry.TABLE,
-				TaskContract.TaskEntry._ID + " = ?",
-				new String[]{task.getId().toString()}
-		);
-		db.close();
+		if (task != null) {
+			SQLiteDatabase db = databaseHelper.getWritableDatabase();
+			db.delete(
+					TaskContract.TaskEntry.TABLE,
+					TaskContract.TaskEntry._ID + " = ?",
+					new String[]{task.getId().toString()}
+			);
+			db.close();
+		}
 	}
 
 	public ArrayList<Task> getTasks() {

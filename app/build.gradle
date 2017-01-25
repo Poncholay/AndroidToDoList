@@ -41,5 +41,7 @@ dependencies {
     testCompile 'org.powermock:powermock:1.6.5'
     testCompile 'org.powermock:powermock-module-junit4:1.6.5'
     testCompile 'org.powermock:powermock-api-mockito:1.6.5'
-    testCompile 'org.json:json:20140107'
+    testCompile 'org.robolectric:robolectric:3.0'
+    //UI Tests
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
 }
