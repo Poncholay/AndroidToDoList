@@ -1,6 +1,9 @@
 package com.poncholay.todolist.Activities.List;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -10,12 +13,22 @@ import android.view.MenuItem;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.github.ybq.parallaxviewpager.Mode;
 import com.github.ybq.parallaxviewpager.ParallaxViewPager;
+import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
+import com.nightonke.boommenu.BoomButtons.HamButton;
+import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
+import com.nightonke.boommenu.BoomMenuButton;
+import com.nightonke.boommenu.ButtonEnum;
+import com.nightonke.boommenu.Piece.PiecePlaceEnum;
+import com.nightonke.boommenu.Util;
 import com.poncholay.todolist.Activities.CreateTask.CreateTaskActivity;
 import com.poncholay.todolist.Activities.List.Fragments.TaskListFragment;
 import com.poncholay.todolist.Activities.List.Fragments.TaskListFragmentAll;
 import com.poncholay.todolist.Activities.List.Fragments.TaskListFragmentDone;
+import com.poncholay.todolist.ColorUtils;
 import com.poncholay.todolist.Constants;
 import com.poncholay.todolist.R;
 import com.poncholay.todolist.controller.db.DatabaseActions;
@@ -27,7 +40,7 @@ import com.poncholay.todolist.model.task.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO: Sort, Categorie, Calendar view, Vocal recognition, Push notification, app preferences
+//TODO: Calendar view, Vocal recognition, Push notification, Tags
 
 public class ListActivity extends AppCompatActivity {
 
@@ -43,12 +56,14 @@ public class ListActivity extends AppCompatActivity {
 
 		super.onCreate(savedInstanceState);
 
-		List<Tab> mTabs = createFragments(savedInstanceState);
+		List<Tab> mTabs = createFragments(savedInstanceState, getPreferences(Context.MODE_PRIVATE).getInt("sort", 0));
 		ParallaxViewPager mParallaxViewPager = (ParallaxViewPager) findViewById(R.id.viewpager);
 		TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager(), mTabs);
 		mParallaxViewPager.setAdapter(tabsAdapter);
 		mParallaxViewPager.setOffscreenPageLimit(1);
 		mParallaxViewPager.setMode(Mode.LEFT_OVERLAY);
+
+		createBoomMenu();
 	}
 
 	@Override
@@ -109,35 +124,96 @@ public class ListActivity extends AppCompatActivity {
 		}
 	}
 
-	private List<Tab> createFragments(Bundle bundle) {
+	private List<Tab> createFragments(Bundle bundle, int index) {
 		List<Tab> fList = new ArrayList<>();
-		if (bundle == null) {
-			TaskListFragment listAllFragment = TaskListFragmentAll.newInstance();
-			TaskListFragment listDoneFragment = TaskListFragmentDone.newInstance();
-			TaskListFragment tmpFragment = TaskListFragmentAll.newInstance();
-
-			fList.add(new Tab("All", listAllFragment));
-			fList.add(new Tab("Done", listDoneFragment));
-			fList.add(new Tab("By Month", tmpFragment));
-
-			Bundle args = new Bundle();
-			args.putBoolean("done", true);
-			listDoneFragment.setArguments(args);
-		} else {
-			List<Fragment> fragments = getSupportFragmentManager().getFragments();
-			fList.add(new Tab("All", fragments.size() > 0 ? (TaskListFragment) fragments.get(0) : TaskListFragmentAll.newInstance()));
-			fList.add(new Tab("Done", fragments.size() > 1 ? (TaskListFragment) fragments.get(1) : TaskListFragmentDone.newInstance()));
-			fList.add(new Tab("Calendar", fragments.size() > 2 ? (TaskListFragment) fragments.get(2) : TaskListFragmentAll.newInstance()));
+		List<Fragment> fragments = null;
+		if (bundle != null) {
+			fragments = getSupportFragmentManager().getFragments();
 		}
+		fList.add(new Tab("All", fragments != null && fragments.size() > 0 ? (TaskListFragment) fragments.get(0) : TaskListFragmentAll.newInstance()));
+		fList.add(new Tab("Done", fragments != null && fragments.size() > 1 ? (TaskListFragment) fragments.get(1) : TaskListFragmentDone.newInstance()));
+		fList.add(new Tab("Calendar", fragments != null && fragments.size() > 2 ? (TaskListFragment) fragments.get(2) : TaskListFragmentAll.newInstance()));
+
+		Bundle args = new Bundle();
+		args.putInt("sort", index);
+		if (fragments == null || fragments.size() <= 0) {
+			fList.get(0).getFragment().setArguments(args);
+		}
+		if (fragments == null || fragments.size() <= 2) {
+			fList.get(2).getFragment().setArguments(args);
+		}
+		Bundle argsDone = (Bundle) args.clone();
+		argsDone.putBoolean("done", true);
+		if (fragments == null || fragments.size() <= 1) {
+			fList.get(1).getFragment().setArguments(argsDone);
+		}
+
 		return fList;
+	}
+
+	private HamButton.Builder createHamButton(int color, String text, String subText, String drawable) {
+		return new HamButton.Builder()
+				.normalImageDrawable(TextDrawable.builder()
+						.beginConfig()
+						.withBorder(2)
+						.endConfig()
+						.buildRound(drawable, ColorUtils.darken(color)))
+				.imagePadding(new Rect(8, 8, 8, 8))
+				.normalText(text)
+				.subNormalText(subText)
+				.containsSubText(true)
+				.shadowEffect(true)
+				.shadowRadius(Util.dp2px(2))
+				.rippleEffect(false)
+				.normalColor(color)
+				.highlightedColor(ColorUtils.darken(ColorUtils.darken(color)))
+				.listener(new OnBMClickListener() {
+					@Override
+					public void onBoomButtonClick(int index) {
+						SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+						SharedPreferences.Editor editor = sharedPref.edit();
+						editor.putInt("sort", index);
+						editor.apply();
+						sortLists(index);
+					}
+				});
+	}
+
+	private void createBoomMenu() {
+		BoomMenuButton bmb = (BoomMenuButton) findViewById(R.id.bmb);
+		bmb.setButtonEnum(ButtonEnum.Ham);
+		bmb.setPiecePlaceEnum(PiecePlaceEnum.HAM_4);
+		bmb.setButtonPlaceEnum(ButtonPlaceEnum.HAM_4);
+
+		ColorGenerator generator = ColorGenerator.MATERIAL;
+		List<Integer> colors = new ArrayList<>();
+		for (int i = 0; i < 4; i ++) {
+			colors.add(generator.getColor(i + i));
+		}
+
+		bmb.addBuilder(createHamButton(ColorUtils.darken(colors.get(0)), "Sort by date", "Closest tasks first", "Jan"));
+		bmb.addBuilder(createHamButton(ColorUtils.darken(colors.get(1)), "Sort by date", "Farthest tasks first", "Dec"));
+		bmb.addBuilder(createHamButton(ColorUtils.darken(colors.get(2)), "Sort alphabetically", "A → Z", "A"));
+		bmb.addBuilder(createHamButton(ColorUtils.darken(colors.get(3)), "Sort alphabetically", "Z → A", "Z"));
+	}
+
+	private void sortLists(int index) {
+		if (getSupportFragmentManager() != null && getSupportFragmentManager().getFragments() != null) {
+			for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+				TaskListFragment taskListFragment = (TaskListFragment) fragment;
+				taskListFragment.sortTasks(index);
+			}
+		}
 	}
 
 	private void createTask(Task task) {
 		task = mDatabase.addTask(task);
 		mTasks.add(task);
-		for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-			TaskListFragment taskListFragment = (TaskListFragment) fragment;
-			taskListFragment.createTask(task);
+		if (getSupportFragmentManager() != null && getSupportFragmentManager().getFragments() != null) {
+			for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+				TaskListFragment taskListFragment = (TaskListFragment) fragment;
+				taskListFragment.createTask(task);
+			}
 		}
 	}
 
@@ -150,19 +226,22 @@ public class ListActivity extends AppCompatActivity {
 		mDatabase.editTask(task);
 		mTasks.remove(task);
 		mTasks.add(task);
-		for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-			TaskListFragment taskListFragment = (TaskListFragment) fragment;
-			taskListFragment.editTask(task);
+		if (getSupportFragmentManager() != null && getSupportFragmentManager().getFragments() != null) {
+			for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+				TaskListFragment taskListFragment = (TaskListFragment) fragment;
+				taskListFragment.editTask(task);
+			}
 		}
-
 	}
 
 	private void deleteTask(Task task) {
 		mDatabase.deleteTask(task);
 		mTasks.remove(task);
-		for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-			TaskListFragment taskListFragment = (TaskListFragment) fragment;
-			taskListFragment.deleteTask(task);
+		if (getSupportFragmentManager() != null && getSupportFragmentManager().getFragments() != null) {
+			for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+				TaskListFragment taskListFragment = (TaskListFragment) fragment;
+				taskListFragment.deleteTask(task);
+			}
 		}
 	}
 

@@ -23,4 +23,11 @@
 				android:background="@drawable/textlines"
 				android:layout_gravity="top" />
 	</com.github.ybq.parallaxviewpager.ParallaxViewPager>
+
+	<com.nightonke.boommenu.BoomMenuButton
+		android:id="@+id/bmb"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentEnd="true"/>
 </RelativeLayout>

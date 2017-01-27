@@ -10,6 +10,7 @@ import android.widget.ListView;
 import com.poncholay.todolist.Activities.List.ListActivity;
 import com.poncholay.todolist.model.task.Task;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class TaskListFragment extends Fragment {
@@ -17,6 +18,7 @@ public class TaskListFragment extends Fragment {
 	protected ListView mListView;
 	protected ArrayAdapter<Task> mAdapter;
 	private Boolean done;
+	private int sortIndex;
 
 	public void deleteTask(Task task) {
 		if (mAdapter != null && task != null) {
@@ -31,8 +33,8 @@ public class TaskListFragment extends Fragment {
 			mAdapter.remove(task);
 			if (task.getDone() == done) {
 				mAdapter.insert(task, pos == -1 ? mAdapter.getCount() : pos);
+				sortTasks(-1);
 			}
-			mAdapter.notifyDataSetChanged();
 		}
 	}
 
@@ -41,7 +43,71 @@ public class TaskListFragment extends Fragment {
 			if (task.getDone() == done) {
 				mAdapter.add(task);
 				mAdapter.notifyDataSetChanged();
+				sortTasks(-1);
 			}
+		}
+	}
+
+	public void sortTasks(int index) {
+		if (index != -1) {
+			this.sortIndex = index;
+		}
+		if (mAdapter != null) {
+			switch (sortIndex) {
+				case 0:
+					mAdapter.sort(new Comparator<Task>() {
+						@Override
+						public int compare(Task l, Task r) {
+							if (l == null || l.getDate() == null) {
+								return 1;
+							}
+							if (r == null || r.getDate() == null) {
+								return -1;
+							}
+							return r.getDate().after(l.getDate()) ? -1 : 1;
+						}
+					});
+					break;
+				case 1:
+					mAdapter.sort(new Comparator<Task>() {
+						@Override
+						public int compare(Task l, Task r) {
+							if (l == null || l.getDate() == null) {
+								return 1;
+							}
+							if (r == null || r.getDate() == null) {
+								return -1;
+							}
+							return r.getDate().after(l.getDate()) ? 1 : -1;
+						}
+					});
+					break;
+				case 2:
+					mAdapter.sort(new Comparator<Task>() {
+						@Override
+						public int compare(Task l, Task r) {
+							if (l == null || r == null) {
+								return l == null ? 1 : -1;
+							}
+							return l.getTitle().compareToIgnoreCase(r.getTitle());
+						}
+					});
+					break;
+				case 3:
+					mAdapter.sort(new Comparator<Task>() {
+						@Override
+						public int compare(Task l, Task r) {
+							if (l == null || r == null) {
+								return l == null ? -1 : 1;
+							}
+							return r.getTitle().compareToIgnoreCase(l.getTitle());
+						}
+					});
+					break;
+				default:
+					break;
+			}
+			mAdapter.notifyDataSetChanged();
 		}
 	}
 
@@ -71,11 +137,13 @@ public class TaskListFragment extends Fragment {
 				}
 			}
 		}
+		sortTasks(state != null ? state.getInt("sort") : 0);
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putBoolean("done", done);
+		outState.putInt("sort", sortIndex);
 	}
 }
