@@ -127,7 +127,7 @@ public class ListActivity extends AppCompatActivity {
 	private List<Tab> createFragments(Bundle bundle, int index) {
 		List<Tab> fList = new ArrayList<>();
 		List<Fragment> fragments = null;
-		if (bundle != null) {
+		if (bundle != null && getSupportFragmentManager() != null) {
 			fragments = getSupportFragmentManager().getFragments();
 		}
 		fList.add(new Tab("All", fragments != null && fragments.size() > 0 ? (TaskListFragment) fragments.get(0) : TaskListFragmentAll.newInstance()));
@@ -191,10 +191,10 @@ public class ListActivity extends AppCompatActivity {
 			colors.add(generator.getColor(i + i));
 		}
 
-		bmb.addBuilder(createHamButton(ColorUtils.darken(colors.get(0)), "Sort by date", "Closest tasks first", "Jan"));
-		bmb.addBuilder(createHamButton(ColorUtils.darken(colors.get(1)), "Sort by date", "Farthest tasks first", "Dec"));
-		bmb.addBuilder(createHamButton(ColorUtils.darken(colors.get(2)), "Sort alphabetically", "A → Z", "A"));
-		bmb.addBuilder(createHamButton(ColorUtils.darken(colors.get(3)), "Sort alphabetically", "Z → A", "Z"));
+		bmb.addBuilder(createHamButton(ColorUtils.darken(colors.get(0)), "Sort by date", "Soon ending tasks first", "Jan"));
+		bmb.addBuilder(createHamButton(ColorUtils.darken(colors.get(1)), "Sort by date", "Latest ending tasks first", "Dec"));
+		bmb.addBuilder(createHamButton(ColorUtils.darken(colors.get(2)), "Sort alphabetically", "Alphabetical order", "A-Z"));
+		bmb.addBuilder(createHamButton(ColorUtils.darken(colors.get(3)), "Sort alphabetically", "Reverse alphabetical order", "Z-A"));
 	}
 
 	private void sortLists(int index) {
