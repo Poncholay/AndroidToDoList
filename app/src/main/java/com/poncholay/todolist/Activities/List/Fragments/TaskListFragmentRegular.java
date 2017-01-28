@@ -12,10 +12,10 @@ import com.poncholay.todolist.model.task.Task;
 
 import java.util.ArrayList;
 
-public class TaskListFragmentAll extends TaskListFragment {
+public class TaskListFragmentRegular extends TaskListFragment {
 
-	public static TaskListFragmentAll newInstance() {
-		return new TaskListFragmentAll();
+	public static TaskListFragmentRegular newInstance() {
+		return new TaskListFragmentRegular();
 	}
 
 	@Override

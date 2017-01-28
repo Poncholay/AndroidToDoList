@@ -26,8 +26,7 @@ import com.nightonke.boommenu.Piece.PiecePlaceEnum;
 import com.nightonke.boommenu.Util;
 import com.poncholay.todolist.Activities.CreateTask.CreateTaskActivity;
 import com.poncholay.todolist.Activities.List.Fragments.TaskListFragment;
-import com.poncholay.todolist.Activities.List.Fragments.TaskListFragmentAll;
-import com.poncholay.todolist.Activities.List.Fragments.TaskListFragmentDone;
+import com.poncholay.todolist.Activities.List.Fragments.TaskListFragmentRegular;
 import com.poncholay.todolist.ColorUtils;
 import com.poncholay.todolist.Constants;
 import com.poncholay.todolist.R;
@@ -39,8 +38,6 @@ import com.poncholay.todolist.model.task.Task;
 
 import java.util.ArrayList;
 import java.util.List;
-
-//TODO: Calendar view, Vocal recognition, Push notification, Tags
 
 public class ListActivity extends AppCompatActivity {
 
@@ -130,17 +127,13 @@ public class ListActivity extends AppCompatActivity {
 		if (bundle != null && getSupportFragmentManager() != null) {
 			fragments = getSupportFragmentManager().getFragments();
 		}
-		fList.add(new Tab("All", fragments != null && fragments.size() > 0 ? (TaskListFragment) fragments.get(0) : TaskListFragmentAll.newInstance()));
-		fList.add(new Tab("Done", fragments != null && fragments.size() > 1 ? (TaskListFragment) fragments.get(1) : TaskListFragmentDone.newInstance()));
-		fList.add(new Tab("Calendar", fragments != null && fragments.size() > 2 ? (TaskListFragment) fragments.get(2) : TaskListFragmentAll.newInstance()));
+		fList.add(new Tab("All", fragments != null && fragments.size() > 0 ? (TaskListFragment) fragments.get(0) : TaskListFragmentRegular.newInstance()));
+		fList.add(new Tab("Done", fragments != null && fragments.size() > 1 ? (TaskListFragment) fragments.get(1) : TaskListFragmentRegular.newInstance()));
 
 		Bundle args = new Bundle();
 		args.putInt("sort", index);
 		if (fragments == null || fragments.size() <= 0) {
 			fList.get(0).getFragment().setArguments(args);
-		}
-		if (fragments == null || fragments.size() <= 2) {
-			fList.get(2).getFragment().setArguments(args);
 		}
 		Bundle argsDone = (Bundle) args.clone();
 		argsDone.putBoolean("done", true);
