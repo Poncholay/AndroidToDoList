@@ -5,7 +5,7 @@ QMBForm
 
 A simple To do list app
 
-## Technical specifications
+## 1. Technical specifications
 
 ToDoList is an android application compatible with the Android SDK API 19.
 It is a gradle based project so one must use gradle to build it.
@@ -41,8 +41,6 @@ The tasks can be switched back and forth between those two lists and they can al
 There is a built in sorting system which allows the user to sort his tasks four different ways. The selected configuration is then stored in the app preferences so that it is retained when the app is relaunched. The user can sort by date or alphabetically, and can reverse the order.
 
 ## 3. User interface
-
-3. User interface
 
 ![alt tag](https://raw.githubusercontent.com/Poncholay/AndroidToDoList/master/README/ui.png)
 
